@@ -1,36 +1,216 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MAPALA - Website Organisasi Mahasiswa Pecinta Alam
 
-## Getting Started
+Website resmi organisasi Mahasiswa Pecinta Alam (MAPALA) yang dibangun menggunakan Next.js 15 dan Tailwind CSS.
 
-First, run the development server:
+![MAPALA Logo](public/mapala-logo.svg)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Fitur Utama
+
+### 🏠 **Homepage**
+- Hero section yang menarik dengan informasi organisasi
+- Statistik organisasi (anggota, kegiatan, pencapaian)
+- Testimonial dan call-to-action
+- Desain responsive untuk semua device
+
+### 👥 **Pendaftaran Anggota**
+- Form pendaftaran online yang lengkap
+- Validasi real-time
+- Sistem notifikasi menggunakan react-toastify
+- Penyimpanan data lokal (dapat diintegrasikan dengan database)
+- Tracking status pendaftaran
+
+### 📄 **Template Surat**
+- Koleksi template surat untuk keperluan organisasi
+- Fitur pencarian dan filter berdasarkan kategori
+- Preview dan download template
+- Statistik penggunaan template
+- Request template baru
+
+### 🛡️ **Panel Admin**
+- Dashboard dengan statistik real-time
+- Manajemen data pendaftaran
+- Approval/rejection system
+- Export data ke CSV
+- Filter dan pencarian data
+
+### 📱 **Responsive Design**
+- Mobile-first approach
+- Optimized untuk tablet dan desktop
+- Consistent UI/UX di semua device
+
+## 🚀 Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS 4
+- **Icons**: Lucide React
+- **Notifications**: React Toastify
+- **Date Handling**: date-fns
+- **Deployment Ready**: Vercel, Netlify, atau hosting lainnya
+
+## 📦 Instalasi
+
+1. **Clone repository**
+   ```bash
+   git clone <repository-url>
+   cd project_organisasi
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Jalankan development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Buka browser**
+   ```
+   http://localhost:3000
+   ```
+
+## 🏗️ Struktur Project
+
+```
+project_organisasi/
+├── app/                          # App directory (Next.js 13+)
+│   ├── api/                      # API routes
+│   │   ├── pendaftaran/         # Endpoint pendaftaran
+│   │   └── template/            # Endpoint template
+│   ├── components/              # Reusable components
+│   │   ├── Navbar.js           # Navigation component
+│   │   └── Footer.js           # Footer component
+│   ├── admin/                   # Admin panel pages
+│   ├── pendaftaran/            # Registration pages
+│   ├── template/               # Template pages
+│   ├── tentang/                # About pages
+│   ├── globals.css             # Global styles
+│   ├── layout.js               # Root layout
+│   └── page.js                 # Homepage
+├── public/                      # Static assets
+│   ├── mapala-logo.svg         # Organization logo
+│   └── ...                     # Other assets
+├── package.json                # Dependencies
+├── tailwind.config.js          # Tailwind configuration
+├── next.config.mjs             # Next.js configuration
+└── README.md                   # Documentation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Fitur yang Diimplementasikan
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### ✅ Sudah Selesai
+- [x] Homepage dengan hero section
+- [x] Halaman tentang organisasi
+- [x] Form pendaftaran anggota
+- [x] Halaman template surat
+- [x] Panel admin dasar
+- [x] Sistem notifikasi
+- [x] Responsive design
+- [x] Navigation dan footer
+- [x] Local storage untuk demo
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🔄 Dalam Pengembangan
+- [ ] Integrasi database (PostgreSQL/MongoDB)
+- [ ] Sistem autentikasi
+- [ ] Upload file pendukung
+- [ ] Email notifications
+- [ ] Payment gateway
+- [ ] Advanced admin features
 
-## Learn More
+## 🎨 Customization
 
-To learn more about Next.js, take a look at the following resources:
+### Mengubah Warna Theme
+Edit file `tailwind.config.js` atau gunakan CSS custom di `globals.css`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```css
+:root {
+  --primary-color: #22c55e;    /* Green */
+  --secondary-color: #3b82f6;  /* Blue */
+  --accent-color: #8b5cf6;     /* Purple */
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Menambah Template Baru
+Edit file `app/template/page.js` dan tambahkan template di array `templates`:
 
-## Deploy on Vercel
+```javascript
+{
+  id: 9,
+  judul: 'Template Baru',
+  kategori: 'Kategori Baru',
+  deskripsi: 'Deskripsi template',
+  // ... properti lainnya
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔧 Konfigurasi
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Environment Variables
+Buat file `.env.local` untuk konfigurasi:
+
+```env
+# Database (optional)
+DATABASE_URL=your_database_url
+
+# Email (optional)
+SMTP_HOST=your_smtp_host
+SMTP_USER=your_email
+SMTP_PASS=your_password
+
+# Auth (optional)
+NEXTAUTH_SECRET=your_secret
+NEXTAUTH_URL=http://localhost:3000
+```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Push code ke GitHub
+2. Connect repository di Vercel
+3. Deploy otomatis
+
+### Netlify
+1. Build project: `npm run build`
+2. Upload folder `out` ke Netlify
+
+### Manual Server
+1. Build: `npm run build`
+2. Start: `npm start`
+3. Setup reverse proxy (Nginx)
+
+## 📊 Features Overview
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Landing Page | ✅ | Homepage dengan informasi organisasi |
+| About Page | ✅ | Sejarah, visi-misi, nilai organisasi |
+| Registration | ✅ | Form pendaftaran online |
+| Templates | ✅ | Download template surat |
+| Admin Panel | ✅ | Manajemen data pendaftaran |
+| Responsive | ✅ | Mobile-friendly design |
+| Notifications | ✅ | Toast notifications |
+| Search & Filter | ✅ | Pencarian dan filter data |
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Create feature branch: `git checkout -b feature/new-feature`
+3. Commit changes: `git commit -am 'Add new feature'`
+4. Push branch: `git push origin feature/new-feature`
+5. Submit pull request
+
+## 📞 Support
+
+Untuk pertanyaan atau bantuan:
+- Email: mapala@university.ac.id
+- Telepon: +62 123 456 7890
+- Website: [your-domain.com]
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**Dibuat dengan ❤️ untuk MAPALA**
