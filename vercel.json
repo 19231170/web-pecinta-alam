@@ -1,14 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  "framework": "nextjs",
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
   "env": {
     "NEXTAUTH_URL": {
-      "value": "https://your-production-url.vercel.app"
+      "value": "https://web-pecinta-alam.vercel.app"
     }
   },
   "build": {

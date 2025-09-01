@@ -45,9 +45,28 @@ vercel --prod
 - Test authentication and other features
 
 ### Troubleshooting
-- If images or styles aren't loading, check for path issues
-- For database connection issues, verify your connection string
-- For auth issues, make sure NEXTAUTH_URL is set correctly
+
+#### Fix for "Default Next.js Landing Page" Issue
+If you see the default Next.js landing page instead of your application:
+
+1. **Check Environment Variables**:
+   - Make sure `NEXTAUTH_URL` is set correctly to your Vercel deployment URL
+   - Verify that `DATABASE_URL` is properly configured
+
+2. **Redeploy with Clean Cache**:
+   - Go to your Vercel project settings
+   - Navigate to the "Deployments" tab
+   - Select the most recent deployment
+   - Click "Redeploy" and check the option to "Clear build cache"
+
+3. **Check Build Logs**:
+   - Review the build logs for any errors
+   - Common issues include database connection failures or missing environment variables
+
+4. **Other Common Issues**:
+   - If images or styles aren't loading, check for path issues
+   - For database connection issues, verify your connection string
+   - For auth issues, make sure NEXTAUTH_URL is set correctly
 
 ### Updating the Deployment
 After making changes to your code, simply push to your main branch, and Vercel will automatically redeploy your application.

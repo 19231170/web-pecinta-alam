@@ -25,9 +25,10 @@ const nextConfig = {
         ? 'http://localhost:3000' 
         : process.env.VERCEL_URL 
           ? `https://${process.env.VERCEL_URL}` 
-          : 'https://your-production-url.com'),
+          : 'https://web-pecinta-alam.vercel.app'),
   },
   // Make sure output is set to standalone for better compatibility with hosting platforms
   output: 'standalone'
+};
 
 export default nextConfig;

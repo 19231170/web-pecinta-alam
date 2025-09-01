@@ -8,7 +8,9 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "seed": "node prisma/seed.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:db": "node scripts/test-db.js",
+    "vercel-build": "npm run test:db && prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@prisma/client": "^6.14.0",
