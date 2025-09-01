@@ -52,7 +52,22 @@ export default function TemplatePage() {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = `${template.judul.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+        
+        // Get the file extension from the Content-Type or use default
+        const contentType = response.headers.get('Content-Type');
+        let extension = 'docx';
+        
+        if (contentType) {
+          if (contentType.includes('msword') || contentType.includes('vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+            extension = 'docx';
+          } else if (contentType.includes('pdf')) {
+            extension = 'pdf';
+          } else if (contentType.includes('html')) {
+            extension = 'html';
+          }
+        }
+        
+        a.download = `${template.judul.replace(/[^a-zA-Z0-9]/g, '_')}.${extension}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -78,9 +93,41 @@ export default function TemplatePage() {
       const response = await fetch(`/api/template/${template.id}`);
       if (response.ok) {
         const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        window.URL.revokeObjectURL(url);
+        
+        // Check if we're dealing with a format that can be previewed
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && (contentType.includes('html') || contentType.includes('text/plain'))) {
+          // For HTML or text content, we can preview directly
+          const url = window.URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          window.URL.revokeObjectURL(url);
+        } else {
+          // For other formats like DOCX or PDF, download instead since browser preview might not work
+          toast.info('Format file ini tidak dapat dipreview secara langsung. Mengunduh file...');
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          
+          // Get the file extension from the Content-Type or use default
+          let extension = 'docx';
+          
+          if (contentType) {
+            if (contentType.includes('msword') || contentType.includes('vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+              extension = 'docx';
+            } else if (contentType.includes('pdf')) {
+              extension = 'pdf';
+            } else if (contentType.includes('html')) {
+              extension = 'html';
+            }
+          }
+          
+          a.download = `${template.judul.replace(/[^a-zA-Z0-9]/g, '_')}.${extension}`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }
       } else {
         toast.error('Gagal membuka preview');
       }
@@ -97,221 +144,224 @@ export default function TemplatePage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
       ) : (
-        <>
+        <div>
           {/* Hero Section */}
-          <section className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">{/* Rest of the JSX content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <FileText className="h-16 w-16 mx-auto mb-6 text-purple-200" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Template Surat
-            </h1>
-            <p className="text-xl md:text-2xl text-purple-100">
-              Koleksi template surat untuk keperluan organisasi
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Search and Filter Section */}
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Cari template surat..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
+          <section className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <FileText className="h-16 w-16 mx-auto mb-6 text-purple-200" />
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                  Template Surat
+                </h1>
+                <p className="text-xl md:text-2xl text-purple-100">
+                  Koleksi template surat untuk keperluan organisasi
+                </p>
+              </div>
             </div>
+          </section>
 
-            {/* Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category === 'Semua' ? '' : category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Templates Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredTemplates.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Tidak ada template yang ditemukan
-              </h3>
-              <p className="text-gray-600">
-                Coba ubah kata kunci pencarian atau filter kategori
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredTemplates.map(template => (
-                <div key={template.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        {template.judul}
-                      </h3>
-                      <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                        {template.kategori}
-                      </span>
-                    </div>
-                    <FileText className="h-8 w-8 text-purple-600" />
-                  </div>
-
-                  <p className="text-gray-600 text-sm mb-4">
-                    {template.deskripsi}
-                  </p>
-
-                    <div className="space-y-2 text-sm text-gray-500 mb-6">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>Update: {new Date(template.updatedAt).toLocaleDateString('id-ID')}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <User className="h-4 w-4 mr-2" />
-                        <span>{template.downloadCount} downloads</span>
-                      </div>
-                      <div className="text-gray-400">
-                        Ukuran: {template.fileSize}
-                      </div>
-                    </div>                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handlePreview(template)}
-                      className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Eye className="h-4 w-4" />
-                      Preview
-                    </button>
-                    <button
-                      onClick={() => handleDownload(template)}
-                      className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download
-                    </button>
-                  </div>
+          {/* Search and Filter Section */}
+          <section className="py-8 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                {/* Search */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari template surat..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
-      {/* Statistics Section */}
-      <section className="py-16 bg-purple-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              Statistik Template
-            </h2>
-            <p className="text-xl text-purple-100">
-              Data penggunaan template surat MAPALA
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold mb-2">{templates.length}</div>
-              <div className="text-purple-200">Total Template</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">
-                {templates.reduce((sum, template) => sum + template.downloadCount, 0)}
+                {/* Filter */}
+                <div className="relative">
+                  <Filter className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  >
+                    {categories.map(category => (
+                      <option key={category} value={category === 'Semua' ? '' : category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="text-purple-200">Total Download</div>
             </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">{categories.length - 1}</div>
-              <div className="text-purple-200">Kategori</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">95%</div>
-              <div className="text-purple-200">Rating Kepuasan</div>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* Help Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Cara Menggunakan Template
-            </h2>
-            <p className="text-xl text-gray-600">
-              Panduan mudah menggunakan template surat MAPALA
-            </p>
-          </div>
+          {/* Templates Grid */}
+          <section className="py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {filteredTemplates.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Tidak ada template yang ditemukan
+                  </h3>
+                  <p className="text-gray-600">
+                    Coba ubah kata kunci pencarian atau filter kategori
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredTemplates.map(template => (
+                    <div key={template.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {template.judul}
+                          </h3>
+                          <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                            {template.kategori}
+                          </span>
+                        </div>
+                        <FileText className="h-8 w-8 text-purple-600" />
+                      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-purple-600">1</span>
+                      <p className="text-gray-600 text-sm mb-4">
+                        {template.deskripsi}
+                      </p>
+
+                      <div className="space-y-2 text-sm text-gray-500 mb-6">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          <span>Update: {new Date(template.updatedAt).toLocaleDateString('id-ID')}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-2" />
+                          <span>{template.downloadCount} downloads</span>
+                        </div>
+                        <div className="text-gray-400">
+                          Ukuran: {template.fileSize}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handlePreview(template)}
+                          className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          Preview
+                        </button>
+                        <button
+                          onClick={() => handleDownload(template)}
+                          className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Statistics Section */}
+          <section className="py-16 bg-purple-800 text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold mb-4">
+                  Statistik Template
+                </h2>
+                <p className="text-xl text-purple-100">
+                  Data penggunaan template surat MAPALA
+                </p>
               </div>
-              <h3 className="font-semibold mb-2">Pilih Template</h3>
-              <p className="text-gray-600 text-sm">
-                Cari dan pilih template yang sesuai dengan kebutuhan surat Anda
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                <div>
+                  <div className="text-4xl font-bold mb-2">{templates.length}</div>
+                  <div className="text-purple-200">Total Template</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold mb-2">
+                    {templates.reduce((sum, template) => sum + template.downloadCount, 0)}
+                  </div>
+                  <div className="text-purple-200">Total Download</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold mb-2">{categories.length - 1}</div>
+                  <div className="text-purple-200">Kategori</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold mb-2">95%</div>
+                  <div className="text-purple-200">Rating Kepuasan</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Help Section */}
+          <section className="py-16 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Cara Menggunakan Template
+                </h2>
+                <p className="text-xl text-gray-600">
+                  Panduan mudah menggunakan template surat MAPALA
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-purple-600">1</span>
+                  </div>
+                  <h3 className="font-semibold mb-2">Pilih Template</h3>
+                  <p className="text-gray-600 text-sm">
+                    Cari dan pilih template yang sesuai dengan kebutuhan surat Anda
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-purple-600">2</span>
+                  </div>
+                  <h3 className="font-semibold mb-2">Download File</h3>
+                  <p className="text-gray-600 text-sm">
+                    Klik tombol download untuk mengunduh template dalam format Word atau PDF
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-bold text-purple-600">3</span>
+                  </div>
+                  <h3 className="font-semibold mb-2">Edit & Gunakan</h3>
+                  <p className="text-gray-600 text-sm">
+                    Buka file dan sesuaikan konten sesuai kebutuhan, lalu gunakan untuk keperluan Anda
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Request Template */}
+          <section className="py-16 bg-gray-900 text-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <FileText className="h-16 w-16 text-purple-400 mx-auto mb-6" />
+              <h2 className="text-3xl font-bold mb-4">
+                Butuh Template Khusus?
+              </h2>
+              <p className="text-xl mb-8 text-gray-300">
+                Tidak menemukan template yang Anda cari? Kirimkan permintaan template baru kepada kami.
               </p>
+              <button className="bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-purple-700 transition-colors">
+                Request Template Baru
+              </button>
             </div>
-
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-purple-600">2</span>
-              </div>
-              <h3 className="font-semibold mb-2">Download File</h3>
-              <p className="text-gray-600 text-sm">
-                Klik tombol download untuk mengunduh template dalam format Word atau PDF
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-purple-600">3</span>
-              </div>
-              <h3 className="font-semibold mb-2">Edit & Gunakan</h3>
-              <p className="text-gray-600 text-sm">
-                Buka file dan sesuaikan konten sesuai kebutuhan, lalu gunakan untuk keperluan Anda
-              </p>
-            </div>
-          </div>
+          </section>
         </div>
-      </section>
-
-      {/* Request Template */}
-      <section className="py-16 bg-gray-900 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <FileText className="h-16 w-16 text-purple-400 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4">
-            Butuh Template Khusus?
-          </h2>
-          <p className="text-xl mb-8 text-gray-300">
-            Tidak menemukan template yang Anda cari? Kirimkan permintaan template baru kepada kami.
-          </p>
-          <button className="bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-purple-700 transition-colors">
-            Request Template Baru
-          </button>
-        </div>
-      </section>
+      )}
     </div>
   );
 }
