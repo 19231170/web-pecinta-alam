@@ -10,7 +10,9 @@ generator client {
 
 datasource db {
   provider     = "postgresql"
-  url          = env("DATABASE_URL")
+  url          = env("DATABASE_URL") // Required: Set this in Vercel environment variables
+  // Format: postgresql://username:password@host:port/database
+  // For Vercel Postgres, use the connection string from your Vercel dashboard
   // Not using directUrl as it might cause issues with Vercel's integrated PostgreSQL
   // Removing relationMode as it's deprecated for newer Prisma versions
 }
