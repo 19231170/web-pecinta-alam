@@ -6,16 +6,13 @@
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // For serverless deployments, use this:
-  directUrl = env("DIRECT_URL")
-  // If deploying to Vercel, add this:
-  relationMode = "prisma"
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  // Not using directUrl as it might cause issues with Vercel's integrated PostgreSQL
+  // Removing relationMode as it's deprecated for newer Prisma versions
 }
 
 model User {
