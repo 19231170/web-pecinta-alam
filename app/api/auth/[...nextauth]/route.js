@@ -3,8 +3,14 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 
-// Handle build-time vs runtime detection
-const isBuildTime = process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production' && !process.env.DATABASE_URL;
+// Handle build-time vs runtime detection - improved detection for Vercel environment
+const isBuildTime = 
+  // Standard build detection
+  (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) ||
+  // Vercel-specific build detection
+  (process.env.VERCEL_ENV && process.env.NEXT_PHASE === 'phase-production-build') ||
+  // Additional build environment signals
+  (process.env.npm_lifecycle_script && process.env.npm_lifecycle_script.includes('next build'));
 
 const authOptions = {
   providers: [
