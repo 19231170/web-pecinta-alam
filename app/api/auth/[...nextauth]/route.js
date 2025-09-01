@@ -3,6 +3,9 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 
+// Handle build-time vs runtime detection
+const isBuildTime = process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production' && !process.env.DATABASE_URL;
+
 const authOptions = {
   providers: [
     CredentialsProvider({
@@ -12,6 +15,12 @@ const authOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
+        // Skip actual DB operations during build time
+        if (isBuildTime) {
+          console.log("Build-time auth request - skipping database operations");
+          return null;
+        }
+        
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
@@ -56,14 +65,19 @@ const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
-        token.nim = user.nim;
+        // Safely set properties with fallbacks
+        token.role = user.role || 'anggota';
+        token.nim = user.nim || null;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.role = token.role;
-      session.user.nim = token.nim;
+      // Make sure session.user exists
+      if (!session.user) session.user = {};
+      
+      // Safely set properties with fallbacks
+      session.user.role = token.role || 'anggota';
+      session.user.nim = token.nim || null;
       return session;
     },
     async redirect({ url, baseUrl }) {
@@ -85,8 +99,28 @@ const authOptions = {
     signIn: '/auth/login',
     signOut: '/auth/login',
   },
-  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key',
+  // Always use NEXTAUTH_SECRET in production, but provide fallback for dev/build
+  secret: process.env.NEXTAUTH_SECRET || 
+          (process.env.NODE_ENV === 'production' 
+            ? undefined  // This will cause a clear error in production if missing
+            : 'dev-secret-key-do-not-use-in-production'),
 };
 
-const handler = NextAuth(authOptions);
+// Wrap the handler in a try/catch to prevent build errors
+let handler;
+try {
+  handler = NextAuth(authOptions);
+} catch (error) {
+  console.error("NextAuth initialization error:", error);
+  
+  // Provide a fallback handler that returns an error for any auth request
+  // This helps prevent build failures while still showing a clear error at runtime
+  handler = async (req, res) => {
+    return new Response(
+      JSON.stringify({ error: "Authentication system configuration error" }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  };
+}
+
 export { handler as GET, handler as POST };
