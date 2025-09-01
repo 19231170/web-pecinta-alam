@@ -28,3 +28,5 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod --yes'
+          env: |
+      DATABASE_URL="postgresql://postgres:DATABASESEKOLAH12@localhost:5432/mapala_db?schema=public"
