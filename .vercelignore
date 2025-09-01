@@ -1,0 +1,16 @@
+# Exclude test files and local environment
+.env.local
+.env.development
+.env.test
+
+# Exclude IDE folders
+.idea
+.vscode
+
+# Exclude Git related
+.git
+.gitignore
+
+# Don't ignore these
+!prisma
+!.env
