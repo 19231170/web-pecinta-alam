@@ -5,8 +5,5 @@
   "installCommand": "npm install",
   "env": {
     "PRISMA_GENERATE_DATAPROXY": "false"
-  },
-  "buildEnvironment": {
-    "NODE_OPTIONS": "--max-old-space-size=4096"
   }
 }
