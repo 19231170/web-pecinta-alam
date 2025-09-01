@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "env": {
+    "NEXTAUTH_URL": {
+      "value": "https://web-pecinta-alam.vercel.app"
+    }
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_VERCEL_ENV": "production"
+    }
+  }
+}

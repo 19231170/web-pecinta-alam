@@ -2,15 +2,31 @@
   "name": "project_organisasi",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start"
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "seed": "node prisma/seed.js",
+    "postinstall": "prisma generate",
+    "test:db": "node scripts/test-db.js",
+    "vercel-build": "npm run test:db && prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@prisma/client": "^6.14.0",
+    "bcryptjs": "^3.0.2",
+    "date-fns": "^4.1.0",
+    "docx": "^9.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.541.0",
+    "next": "15.5.0",
+    "next-auth": "^4.24.11",
+    "pg": "^8.16.3",
+    "prisma": "^6.14.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.0"
+    "react-toastify": "^11.0.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
