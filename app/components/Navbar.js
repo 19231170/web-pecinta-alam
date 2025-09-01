@@ -45,8 +45,19 @@ export default function Navbar() {
 
   const menuItems = getMenuItems();
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: '/' });
+  const handleSignOut = async () => {
+    try {
+      // Force redirect to port 3000
+      const baseUrl = 'http://localhost:3000';
+      await signOut({ 
+        callbackUrl: `${baseUrl}/auth/login`,
+        redirect: true
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback manual redirect
+      window.location.href = 'http://localhost:3000/auth/login';
+    }
   };
 
   return (

@@ -6,11 +6,16 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // For serverless deployments, use this:
+  directUrl = env("DIRECT_URL")
+  // If deploying to Vercel, add this:
+  relationMode = "prisma"
 }
 
 model User {
@@ -77,6 +82,7 @@ model Template {
   fileName        String   @unique
   filePath        String
   fileSize        String
+  fileContent     String?  @db.Text
   downloadCount   Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

@@ -27,17 +27,33 @@ export default function AnggotaDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   useEffect(() => {
-    // Load data untuk statistik
-    const anggotaData = JSON.parse(localStorage.getItem('anggota') || '[]');
-    const pendaftaranData = JSON.parse(localStorage.getItem('pendaftaran') || '[]');
-    const approvedMembers = pendaftaranData.filter(p => p.status === 'Disetujui');
+    async function loadData() {
+      try {
+        // Load data untuk statistik
+        const anggotaData = JSON.parse(localStorage.getItem('anggota') || '[]');
+        const pendaftaranData = JSON.parse(localStorage.getItem('pendaftaran') || '[]');
+        const approvedMembers = pendaftaranData.filter(p => p.status === 'Disetujui');
+        
+        // Fetch template count from API
+        const templateResponse = await fetch('/api/template');
+        let templateCount = 0;
+        if (templateResponse.ok) {
+          const templateData = await templateResponse.json();
+          templateCount = templateData.templates?.length || 0;
+        }
+        
+        setStats({
+          totalAnggota: anggotaData.length + approvedMembers.length,
+          templateTersedia: templateCount,
+          kegiatanBulanIni: 3,
+          downloadBulanIni: 12
+        });
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
     
-    setStats({
-      totalAnggota: anggotaData.length + approvedMembers.length,
-      templateTersedia: 8,
-      kegiatanBulanIni: 3,
-      downloadBulanIni: 12
-    });
+    loadData();
 
     // Recent activities
     const activities = [

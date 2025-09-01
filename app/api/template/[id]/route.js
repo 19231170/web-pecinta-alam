@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../lib/prisma';
+import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
+import path from 'path';
+import fs from 'fs';
 
 export async function GET(request, { params }) {
   try {
@@ -43,21 +45,73 @@ export async function GET(request, { params }) {
       }
     }
 
-    // Simulasi konten template
-    const templateContent = `TEMPLATE: ${template.judul}
+    // Determine content type based on the filename extension
+    const fileExt = path.extname(template.fileName || '').toLowerCase();
+    let contentType = 'application/octet-stream'; // Default fallback
+    let fileExtension = '.docx'; // Default extension
+    
+    if (fileExt === '.docx') {
+      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      fileExtension = '.docx';
+    } else if (fileExt === '.doc') {
+      contentType = 'application/msword';
+      fileExtension = '.doc';
+    } else if (fileExt === '.txt') {
+      contentType = 'text/plain';
+      fileExtension = '.txt';
+    } else if (fileExt === '.rtf') {
+      contentType = 'application/rtf';
+      fileExtension = '.rtf';
+    }
+
+    // Use the stored file content if available
+    let buffer;
+    
+    if (template.fileContent) {
+      // Convert base64 back to binary data
+      const binaryString = atob(template.fileContent);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      buffer = Buffer.from(bytes);
+    } else {
+      // Fallback if no content was stored (for backward compatibility)
+      const fallbackContent = `MAHASISWA PECINTA ALAM (MAPALA)
+${template.judul}
 
 Kategori: ${template.kategori}
 Deskripsi: ${template.deskripsi}
 
-[Konten template akan berada di sini...]
+---
 
-File: ${template.fileName}
-Diunduh: ${template.downloadCount + 1} kali`;
+Kepada Yth,
+[Nama Penerima]
+[Alamat]
 
-    return new NextResponse(templateContent, {
+Dengan hormat,
+
+Sehubungan dengan [isi surat sesuai keperluan], dengan ini kami mengajukan permohonan...
+
+[Isi konten template - silakan sesuaikan dengan kebutuhan]
+
+Demikian surat ini kami buat, atas perhatian dan kerjasamanya kami ucapkan terima kasih.
+
+Hormat kami,
+
+[Nama Penandatangan]
+[Jabatan]
+MAPALA
+
+Template MAPALA - Downloaded ${template.downloadCount + 1} times`;
+
+      buffer = Buffer.from(fallbackContent, 'utf8');
+    }
+
+    return new NextResponse(buffer, {
       headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="${template.fileName}"`,
+        'Content-Type': contentType,
+        'Content-Disposition': `attachment; filename="${template.judul.replace(/[^a-zA-Z0-9]/g, '_')}${fileExtension}"`,
       },
     });
 
@@ -70,22 +124,52 @@ Diunduh: ${template.downloadCount + 1} kali`;
   }
 }
 
-export async function POST() {
+export async function PUT(request, { params }) {
   try {
-    const templates = await prisma.template.findMany({
-      orderBy: {
-        downloadCount: 'desc'
+    const { id } = params;
+    const { judul, kategori, deskripsi, fileName, filePath, fileSize } = await request.json();
+
+    const template = await prisma.template.update({
+      where: { id },
+      data: {
+        judul,
+        kategori,
+        deskripsi,
+        fileName,
+        filePath,
+        fileSize
       }
     });
 
     return NextResponse.json({
       success: true,
-      templates: templates
+      template: template
     });
   } catch (error) {
-    console.error('Fetch templates error:', error);
+    console.error('Update template error:', error);
     return NextResponse.json(
-      { error: 'Terjadi kesalahan saat mengambil data template' },
+      { error: 'Terjadi kesalahan saat memperbarui template' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request, { params }) {
+  try {
+    const { id } = params;
+
+    await prisma.template.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Template berhasil dihapus'
+    });
+  } catch (error) {
+    console.error('Delete template error:', error);
+    return NextResponse.json(
+      { error: 'Terjadi kesalahan saat menghapus template' },
       { status: 500 }
     );
   }

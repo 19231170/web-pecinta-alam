@@ -1,87 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Download, Eye, Search, Filter, Calendar, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 export default function TemplatePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const templates = [
-    {
-      id: 1,
-      judul: 'Surat Izin Kegiatan Pendakian',
-      kategori: 'Izin Kegiatan',
-      deskripsi: 'Template surat permohonan izin untuk kegiatan pendakian gunung',
-      tanggalUpdate: '2025-01-15',
-      fileSize: '25 KB',
-      downloadCount: 142
-    },
-    {
-      id: 2,
-      judul: 'Surat Rekomendasi Anggota',
-      kategori: 'Rekomendasi',
-      deskripsi: 'Template surat rekomendasi untuk anggota MAPALA',
-      tanggalUpdate: '2025-01-10',
-      fileSize: '22 KB',
-      downloadCount: 89
-    },
-    {
-      id: 3,
-      judul: 'Proposal Kegiatan Konservasi',
-      kategori: 'Proposal',
-      deskripsi: 'Template proposal untuk kegiatan konservasi lingkungan',
-      tanggalUpdate: '2025-01-08',
-      fileSize: '45 KB',
-      downloadCount: 67
-    },
-    {
-      id: 4,
-      judul: 'Surat Undangan Rapat',
-      kategori: 'Undangan',
-      deskripsi: 'Template surat undangan untuk rapat organisasi',
-      tanggalUpdate: '2025-01-05',
-      fileSize: '18 KB',
-      downloadCount: 234
-    },
-    {
-      id: 5,
-      judul: 'Laporan Kegiatan',
-      kategori: 'Laporan',
-      deskripsi: 'Template laporan kegiatan organisasi',
-      tanggalUpdate: '2024-12-28',
-      fileSize: '38 KB',
-      downloadCount: 156
-    },
-    {
-      id: 6,
-      judul: 'Surat Permohonan Sponsorship',
-      kategori: 'Permohonan',
-      deskripsi: 'Template surat permohonan bantuan sponsorship',
-      tanggalUpdate: '2024-12-25',
-      fileSize: '28 KB',
-      downloadCount: 98
-    },
-    {
-      id: 7,
-      judul: 'Surat Keterangan Anggota',
-      kategori: 'Keterangan',
-      deskripsi: 'Template surat keterangan keanggotaan MAPALA',
-      tanggalUpdate: '2024-12-20',
-      fileSize: '20 KB',
-      downloadCount: 178
-    },
-    {
-      id: 8,
-      judul: 'Proposal Pelatihan SAR',
-      kategori: 'Proposal',
-      deskripsi: 'Template proposal untuk kegiatan pelatihan Search and Rescue',
-      tanggalUpdate: '2024-12-15',
-      fileSize: '42 KB',
-      downloadCount: 73
+  useEffect(() => {
+    loadTemplates();
+  }, []);
+
+  const loadTemplates = async () => {
+    try {
+      const response = await fetch('/api/template');
+      if (response.ok) {
+        const data = await response.json();
+        setTemplates(data.templates);
+      } else {
+        console.error('Failed to load templates');
+        toast.error('Gagal memuat template');
+      }
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      toast.error('Terjadi kesalahan saat memuat template');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const categories = ['Semua', 'Izin Kegiatan', 'Rekomendasi', 'Proposal', 'Undangan', 'Laporan', 'Permohonan', 'Keterangan'];
 
@@ -92,22 +41,65 @@ export default function TemplatePage() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDownload = (template) => {
-    // Simulasi download file
-    toast.success(`Mengunduh ${template.judul}...`);
-    
-    // Update download count (dalam aplikasi nyata, ini akan disimpan ke database)
-    console.log(`Downloaded: ${template.judul}`);
+  const handleDownload = async (template) => {
+    try {
+      toast.info(`Mengunduh ${template.judul}...`);
+      
+      const response = await fetch(`/api/template/${template.id}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `${template.judul.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        toast.success(`${template.judul} berhasil diunduh`);
+        
+        // Refresh templates to update download count
+        loadTemplates();
+      } else {
+        toast.error('Gagal mengunduh template');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Terjadi kesalahan saat mengunduh');
+    }
   };
 
-  const handlePreview = (template) => {
-    toast.info(`Membuka preview ${template.judul}...`);
+  const handlePreview = async (template) => {
+    try {
+      toast.info(`Membuka preview ${template.judul}...`);
+      
+      const response = await fetch(`/api/template/${template.id}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        window.URL.revokeObjectURL(url);
+      } else {
+        toast.error('Gagal membuka preview');
+      }
+    } catch (error) {
+      console.error('Preview error:', error);
+      toast.error('Terjadi kesalahan saat membuka preview');
+    }
   };
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">
+      {loading ? (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        </div>
+      ) : (
+        <>
+          {/* Hero Section */}
+          <section className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">{/* Rest of the JSX content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <FileText className="h-16 w-16 mx-auto mb-6 text-purple-200" />
@@ -189,21 +181,19 @@ export default function TemplatePage() {
                     {template.deskripsi}
                   </p>
 
-                  <div className="space-y-2 text-sm text-gray-500 mb-6">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span>Update: {new Date(template.tanggalUpdate).toLocaleDateString('id-ID')}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <User className="h-4 w-4 mr-2" />
-                      <span>{template.downloadCount} downloads</span>
-                    </div>
-                    <div className="text-gray-400">
-                      Ukuran: {template.fileSize}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
+                    <div className="space-y-2 text-sm text-gray-500 mb-6">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        <span>Update: {new Date(template.updatedAt).toLocaleDateString('id-ID')}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <User className="h-4 w-4 mr-2" />
+                        <span>{template.downloadCount} downloads</span>
+                      </div>
+                      <div className="text-gray-400">
+                        Ukuran: {template.fileSize}
+                      </div>
+                    </div>                  <div className="flex gap-2">
                     <button
                       onClick={() => handlePreview(template)}
                       className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"

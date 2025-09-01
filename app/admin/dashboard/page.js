@@ -17,37 +17,53 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalAnggota: 0,
     pendaftaranBaru: 0,
-    templateTersedia: 8,
+    templateTersedia: 0,
     aktivitasBulanIni: 5
   });
 
   const [recentActivity, setRecentActivity] = useState([]);
 
   useEffect(() => {
-    // Load data dari localStorage
-    const pendaftaranData = JSON.parse(localStorage.getItem('pendaftaran') || '[]');
-    const anggotaData = JSON.parse(localStorage.getItem('anggota') || '[]');
-    
-    setStats({
-      totalAnggota: anggotaData.length + pendaftaranData.filter(p => p.status === 'Disetujui').length,
-      pendaftaranBaru: pendaftaranData.filter(p => p.status === 'Menunggu Verifikasi').length,
-      templateTersedia: 8,
-      aktivitasBulanIni: 5
-    });
-
-    // Recent activity
-    const activities = pendaftaranData
-      .slice(-5)
-      .map(item => ({
-        id: item.id,
-        type: 'pendaftaran',
-        message: `${item.nama} mendaftar sebagai anggota`,
-        time: new Date(item.tanggalDaftar).toLocaleDateString('id-ID'),
-        status: item.status
-      }));
-    
-    setRecentActivity(activities);
+    loadDashboardData();
   }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      // Load data dari localStorage
+      const pendaftaranData = JSON.parse(localStorage.getItem('pendaftaran') || '[]');
+      const anggotaData = JSON.parse(localStorage.getItem('anggota') || '[]');
+      
+      // Load template count from API
+      const templateResponse = await fetch('/api/template');
+      let templateCount = 0;
+      if (templateResponse.ok) {
+        const templateData = await templateResponse.json();
+        templateCount = templateData.templates?.length || 0;
+      }
+      
+      setStats({
+        totalAnggota: anggotaData.length + pendaftaranData.filter(p => p.status === 'Disetujui').length,
+        pendaftaranBaru: pendaftaranData.filter(p => p.status === 'Menunggu Verifikasi').length,
+        templateTersedia: templateCount,
+        aktivitasBulanIni: 5
+      });
+
+      // Recent activity
+      const activities = pendaftaranData
+        .slice(-5)
+        .map(item => ({
+          id: item.id,
+          type: 'pendaftaran',
+          message: `${item.nama} mendaftar sebagai anggota`,
+          time: new Date(item.tanggalDaftar).toLocaleDateString('id-ID'),
+          status: item.status
+        }));
+      
+      setRecentActivity(activities);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    }
+  };
 
   return (
     <ProtectedRoute allowedRoles={['admin']}>

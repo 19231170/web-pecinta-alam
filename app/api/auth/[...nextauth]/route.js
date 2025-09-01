@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import prisma from '../../../lib/prisma';
+import prisma from '@/lib/prisma';
 
 const authOptions = {
   providers: [
@@ -66,9 +66,24 @@ const authOptions = {
       session.user.nim = token.nim;
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Handle redirects properly in both development and production
+      if (url.startsWith('/')) {
+        // For relative URLs, use the base URL
+        return `${baseUrl}${url}`;
+      } 
+      // For absolute URLs, check if they're from our domain
+      else if (new URL(url).origin === baseUrl || 
+              (process.env.NODE_ENV === 'development' && new URL(url).hostname === 'localhost')) {
+        return url;
+      }
+      // Default fallback
+      return baseUrl;
+    },
   },
   pages: {
     signIn: '/auth/login',
+    signOut: '/auth/login',
   },
   secret: process.env.NEXTAUTH_SECRET || 'your-secret-key',
 };

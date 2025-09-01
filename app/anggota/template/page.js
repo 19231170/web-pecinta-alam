@@ -9,89 +9,31 @@ export default function AnggotaTemplate() {
   const [templates, setTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const categories = ['Semua', 'Izin Kegiatan', 'Rekomendasi', 'Proposal', 'Undangan', 'Laporan', 'Permohonan', 'Keterangan'];
 
   useEffect(() => {
-    // Load templates from localStorage
-    const defaultTemplates = [
-      {
-        id: 1,
-        judul: 'Surat Izin Kegiatan Pendakian',
-        kategori: 'Izin Kegiatan',
-        deskripsi: 'Template surat permohonan izin untuk kegiatan pendakian gunung',
-        tanggalUpdate: '2025-01-15',
-        fileSize: '25 KB',
-        downloadCount: 142
-      },
-      {
-        id: 2,
-        judul: 'Surat Rekomendasi Anggota',
-        kategori: 'Rekomendasi',
-        deskripsi: 'Template surat rekomendasi untuk anggota MAPALA',
-        tanggalUpdate: '2025-01-10',
-        fileSize: '22 KB',
-        downloadCount: 89
-      },
-      {
-        id: 3,
-        judul: 'Proposal Kegiatan Konservasi',
-        kategori: 'Proposal',
-        deskripsi: 'Template proposal untuk kegiatan konservasi lingkungan',
-        tanggalUpdate: '2025-01-08',
-        fileSize: '45 KB',
-        downloadCount: 67
-      },
-      {
-        id: 4,
-        judul: 'Surat Undangan Rapat',
-        kategori: 'Undangan',
-        deskripsi: 'Template surat undangan untuk rapat organisasi',
-        tanggalUpdate: '2025-01-05',
-        fileSize: '18 KB',
-        downloadCount: 234
-      },
-      {
-        id: 5,
-        judul: 'Laporan Kegiatan',
-        kategori: 'Laporan',
-        deskripsi: 'Template laporan kegiatan organisasi',
-        tanggalUpdate: '2024-12-28',
-        fileSize: '38 KB',
-        downloadCount: 156
-      },
-      {
-        id: 6,
-        judul: 'Surat Permohonan Sponsorship',
-        kategori: 'Permohonan',
-        deskripsi: 'Template surat permohonan bantuan sponsorship',
-        tanggalUpdate: '2024-12-25',
-        fileSize: '28 KB',
-        downloadCount: 98
-      },
-      {
-        id: 7,
-        judul: 'Surat Keterangan Anggota',
-        kategori: 'Keterangan',
-        deskripsi: 'Template surat keterangan keanggotaan MAPALA',
-        tanggalUpdate: '2024-12-20',
-        fileSize: '20 KB',
-        downloadCount: 178
-      },
-      {
-        id: 8,
-        judul: 'Proposal Pelatihan SAR',
-        kategori: 'Proposal',
-        deskripsi: 'Template proposal untuk kegiatan pelatihan Search and Rescue',
-        tanggalUpdate: '2024-12-15',
-        fileSize: '42 KB',
-        downloadCount: 73
-      }
-    ];
-
-    const savedTemplates = JSON.parse(localStorage.getItem('templates') || JSON.stringify(defaultTemplates));
-    setTemplates(savedTemplates);
+    loadTemplates();
   }, []);
+
+  const loadTemplates = async () => {
+    try {
+      const response = await fetch('/api/template');
+      if (response.ok) {
+        const data = await response.json();
+        setTemplates(data.templates);
+      } else {
+        console.error('Failed to load templates');
+        toast.error('Gagal memuat template');
+      }
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      toast.error('Terjadi kesalahan saat memuat template');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,20 +42,70 @@ export default function AnggotaTemplate() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDownload = (template) => {
-    // Update download count
-    const updatedTemplates = templates.map(t => 
-      t.id === template.id ? { ...t, downloadCount: t.downloadCount + 1 } : t
-    );
-    setTemplates(updatedTemplates);
-    localStorage.setItem('templates', JSON.stringify(updatedTemplates));
-    
-    toast.success(`Mengunduh ${template.judul}...`);
+  const handleDownload = async (template) => {
+    try {
+      toast.info(`Mengunduh ${template.judul}...`);
+      
+      const response = await fetch(`/api/template/${template.id}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        
+        // Determine file extension from the original filename or default to .docx
+        const fileExt = template.fileName ? 
+          template.fileName.substring(template.fileName.lastIndexOf('.')) : 
+          '.docx';
+        
+        a.download = `${template.judul.replace(/[^a-zA-Z0-9]/g, '_')}${fileExt}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        toast.success(`${template.judul} berhasil diunduh`);
+        
+        // Refresh templates to update download count
+        loadTemplates();
+      } else {
+        toast.error('Gagal mengunduh template');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Terjadi kesalahan saat mengunduh');
+    }
   };
 
-  const handlePreview = (template) => {
-    toast.info(`Membuka preview ${template.judul}...`);
+  const handlePreview = async (template) => {
+    try {
+      toast.info(`Membuka preview ${template.judul}...`);
+      
+      const response = await fetch(`/api/template/${template.id}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        window.URL.revokeObjectURL(url);
+      } else {
+        toast.error('Gagal membuka preview');
+      }
+    } catch (error) {
+      console.error('Preview error:', error);
+      toast.error('Terjadi kesalahan saat membuka preview');
+    }
   };
+
+  if (loading) {
+    return (
+      <ProtectedRoute allowedRoles={['anggota']}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute allowedRoles={['anggota']}>
@@ -196,7 +188,7 @@ export default function AnggotaTemplate() {
                   <div className="space-y-2 text-sm text-gray-500 mb-6">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2" />
-                      <span>Update: {new Date(template.tanggalUpdate).toLocaleDateString('id-ID')}</span>
+                      <span>Update: {new Date(template.updatedAt).toLocaleDateString('id-ID')}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>{template.downloadCount} downloads</span>
