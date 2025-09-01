@@ -204,7 +204,7 @@ NEXTAUTH_URL=http://localhost:3000
 
 Untuk pertanyaan atau bantuan:
 - Email: mapala@university.ac.id
-- Telepon: +62 123 456 7890
+- Telepon: +62 857 1548 4773
 - Website: [your-domain.com]
 
 ## 📄 License
