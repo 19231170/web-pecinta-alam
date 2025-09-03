@@ -252,12 +252,32 @@ async function main() {
       },
     });
 
+    // Create or update Site Settings
+    await prisma.siteSettings.upsert({
+      where: { id: 1 },
+      update: {},
+      create: {
+        siteName: 'MAPALA',
+        siteDescription: 'Mahasiswa Pecinta Alam',
+        adminEmail: 'admin@mapala.ac.id',
+        maxMembers: 100,
+        registrationOpen: true,
+        emailNotifications: true,
+        autoApproval: false,
+        backupInterval: 'weekly',
+        sessionTimeout: 30,
+        maintenanceMode: false,
+        lastBackup: new Date()
+      },
+    });
+
     console.log('✅ Seeding completed successfully!');
     console.log('👤 Created users:');
     console.log('  - Admin: admin@mapala.ac.id (password: admin123)');
     console.log('  - Anggota: anggota@mapala.ac.id (password: anggota123)');
     console.log('  - Plus 3 sample members and 1 pending registration');
     console.log('📄 Created 5 sample templates');
+    console.log('⚙️ Created site settings');
   } catch (error) {
     console.error('❌ Seeding failed:', error);
     throw error;

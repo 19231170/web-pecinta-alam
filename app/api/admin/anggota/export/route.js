@@ -88,6 +88,7 @@ export async function GET() {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="data-anggota-mapala-${new Date().toISOString().split('T')[0]}.csv"`,
+        'X-Content-Type-Options': 'nosniff',
       },
     });
 

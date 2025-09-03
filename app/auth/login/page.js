@@ -41,9 +41,9 @@ export default function LoginPage() {
         
         // Get session to determine role
         const session = await getSession();
-        if (session?.user?.role === 'admin') {
+        if (session?.user?.role === 'ADMIN') {
           router.push('/admin/dashboard');
-        } else if (session?.user?.role === 'anggota') {
+        } else if (session?.user?.role === 'ANGGOTA') {
           router.push('/anggota/dashboard');
         } else {
           router.push('/');

@@ -27,7 +27,10 @@ const authOptions = {
           return null;
         }
         
+        console.log('Auth attempt for email:', credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log('Missing credentials');
           return null;
         }
 
@@ -38,7 +41,10 @@ const authOptions = {
             }
           });
 
+          console.log('User found:', !!user);
+          
           if (!user) {
+            console.log('User not found for email:', credentials.email);
             return null;
           }
 
@@ -47,17 +53,23 @@ const authOptions = {
             user.password
           );
 
+          console.log('Password valid:', isPasswordValid);
+          
           if (!isPasswordValid) {
+            console.log('Invalid password for user:', credentials.email);
             return null;
           }
 
-          return {
+          const result = {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role.toLowerCase(),
+            role: user.role,  // Keep role as is from database (ADMIN, ANGGOTA)
             nim: user.nim
           };
+          
+          console.log('Auth successful, returning user:', result);
+          return result;
         } catch (error) {
           console.error('Auth error:', error);
           return null;
@@ -67,26 +79,35 @@ const authOptions = {
   ],
   session: {
     strategy: 'jwt',
+    // Set session timeout to 10 minutes
+    maxAge: 10 * 60, // 10 minutes in seconds
+    // Update session activity
+    updateAge: 60, // Update session every 60 seconds of activity
   },
   callbacks: {
     async jwt({ token, user }) {
+      console.log('JWT callback - user:', user, 'token:', token);
       if (user) {
-        // Safely set properties with fallbacks
-        token.role = user.role || 'anggota';
+        // Keep role as is from the database
+        token.role = user.role || 'ANGGOTA';
         token.nim = user.nim || null;
+        token.id = user.id;
       }
       return token;
     },
     async session({ session, token }) {
+      console.log('Session callback - session:', session, 'token:', token);
       // Make sure session.user exists
       if (!session.user) session.user = {};
       
-      // Safely set properties with fallbacks
-      session.user.role = token.role || 'anggota';
+      // Keep role as is from the token
+      session.user.role = token.role || 'ANGGOTA';
       session.user.nim = token.nim || null;
+      session.user.id = token.id;
       return session;
     },
     async redirect({ url, baseUrl }) {
+      console.log('Redirect callback - url:', url, 'baseUrl:', baseUrl);
       // Handle redirects properly in both development and production
       if (url.startsWith('/')) {
         // For relative URLs, use the base URL
@@ -129,4 +150,4 @@ try {
   };
 }
 
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST, authOptions };

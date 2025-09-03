@@ -3,8 +3,8 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthProvider from "./components/AuthProvider";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 // Use Inter font which is more stable for deployments
 const inter = Inter({
@@ -35,17 +35,8 @@ export default function RootLayout({ children }) {
             </main>
             <Footer />
           </div>
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
+          <Toaster position="top-right" />
+          <SpeedInsights />
         </AuthProvider>
       </body>
     </html>

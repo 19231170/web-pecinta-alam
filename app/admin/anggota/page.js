@@ -160,12 +160,12 @@ export default function AdminAnggota() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `data-anggota-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.download = `data-anggota-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success('Data anggota berhasil diekspor');
+      toast.success('Data anggota berhasil diekspor ke CSV');
     } catch (error) {
       console.error('Error exporting data:', error);
       toast.error('Gagal mengekspor data');

@@ -76,12 +76,6 @@ export default function AdminDashboard() {
                 <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
                 <p className="text-gray-600">Selamat datang di panel administrasi MAPALA</p>
               </div>
-              <div className="flex items-center space-x-4">
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                  <Settings className="h-4 w-4 inline mr-2" />
-                  Pengaturan
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -236,7 +230,7 @@ export default function AdminDashboard() {
                   </a>
 
                   <a
-                    href="/admin/settings"
+                    href="/admin/pengaturan"
                     className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <Settings className="h-8 w-8 text-gray-600 mb-2" />

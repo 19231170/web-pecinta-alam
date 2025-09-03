@@ -11,7 +11,8 @@ import {
   Mountain,
   Download,
   TrendingUp,
-  Activity
+  Activity,
+  Settings
 } from 'lucide-react';
 
 export default function AnggotaDashboard() {
@@ -289,7 +290,7 @@ export default function AnggotaDashboard() {
                 </a>
 
                 <a
-                  href="/profile"
+                  href="/anggota/profile"
                   className="p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
                 >
                   <Award className="h-8 w-8 text-green-600 mx-auto mb-2" />

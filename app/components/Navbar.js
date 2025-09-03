@@ -99,15 +99,15 @@ export default function Navbar() {
                       <div className="font-medium">{session.user.name}</div>
                       <div className="text-gray-500">{session.user.email}</div>
                       <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded mt-1 inline-block">
-                        {session.user.role === 'admin' ? 'Administrator' : 'Anggota'}
+                        {session.user.role === 'ADMIN' ? 'Administrator' : 'Anggota'}
                       </div>
                     </div>
                     <Link
-                      href="/profile"
+                      href={`/${session.user.role.toLowerCase()}/pengaturan`}
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <Settings className="h-4 w-4 mr-2" />
-                      Profil
+                      Pengaturan Akun
                     </Link>
                     <button
                       onClick={handleSignOut}

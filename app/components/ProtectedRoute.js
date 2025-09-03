@@ -16,6 +16,10 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
       return;
     }
 
+    // Debug: Log current role and expected roles
+    console.log('User role:', session.user.role, 'Type:', typeof session.user.role);
+    console.log('Allowed roles:', allowedRoles, 'Includes role:', allowedRoles.includes(session.user.role));
+
     if (allowedRoles.length > 0 && !allowedRoles.includes(session.user.role)) {
       router.push('/unauthorized');
       return;
