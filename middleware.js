@@ -1,8 +1,9 @@
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
 
-export default auth;
+export default NextAuth(authConfig).auth;
 
-// See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/admin/:path*", "/anggota/:path*", "/template/:path*"],
+  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
+  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };
