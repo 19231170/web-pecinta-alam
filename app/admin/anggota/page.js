@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { Users, Plus, Edit, Trash2, Eye, Search, Filter, UserCheck, UserX, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -185,19 +184,17 @@ export default function AdminAnggota() {
 
   if (loading) {
     return (
-      <ProtectedRoute allowedRoles={['admin']}>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Memuat data anggota...</p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Memuat data anggota...</p>
         </div>
-      </ProtectedRoute>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute allowedRoles={['admin']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -601,6 +598,6 @@ export default function AdminAnggota() {
           </div>
         )}
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

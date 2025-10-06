@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   User, 
   Mail, 
@@ -139,16 +138,14 @@ export default function AnggotaProfile() {
 
   if (loading) {
     return (
-      <ProtectedRoute allowedRoles={['anggota', 'admin']}>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        </div>
-      </ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute allowedRoles={['anggota', 'admin']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -517,6 +514,6 @@ export default function AnggotaProfile() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

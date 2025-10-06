@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   Settings, 
   Save, 
@@ -150,16 +149,14 @@ export default function AdminPengaturan() {
 
   if (loading) {
     return (
-      <ProtectedRoute allowedRoles={['admin']}>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        </div>
-      </ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute allowedRoles={['admin']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -513,6 +510,6 @@ export default function AdminPengaturan() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

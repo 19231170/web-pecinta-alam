@@ -1,23 +1,8 @@
-import { NextResponse } from 'next/server';
+import { auth } from "@/auth";
 
-export function middleware(request) {
-  // This middleware helps debug issues by exposing environment information
-  // You can remove it after deployment is working correctly
-  
-  // Continue to the requested page
-  return NextResponse.next();
-}
+export default auth;
 
-// This will run the middleware on all paths
+// See "Matching Paths" below to learn more
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ["/admin/:path*", "/anggota/:path*", "/template/:path*"],
 };

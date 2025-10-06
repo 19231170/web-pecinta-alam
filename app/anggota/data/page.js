@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { Users, Search, Filter, Mail, Phone, MapPin, Calendar, Eye, UserCheck, UserX } from 'lucide-react';
 
 export default function AnggotaData() {
@@ -136,7 +135,7 @@ export default function AnggotaData() {
   const stats = getMemberStats();
 
   return (
-    <ProtectedRoute allowedRoles={['anggota']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -445,6 +444,6 @@ export default function AnggotaData() {
           </div>
         )}
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

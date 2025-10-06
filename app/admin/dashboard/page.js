@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   Users, 
   FileText, 
@@ -66,7 +65,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <ProtectedRoute allowedRoles={['admin']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -249,6 +248,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

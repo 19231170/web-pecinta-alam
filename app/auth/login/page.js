@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
@@ -38,16 +38,10 @@ export default function LoginPage() {
         toast.error('Email atau password salah');
       } else {
         toast.success('Login berhasil!');
-        
-        // Get session to determine role
-        const session = await getSession();
-        if (session?.user?.role === 'admin') {
-          router.push('/admin/dashboard');
-        } else if (session?.user?.role === 'anggota') {
-          router.push('/anggota/dashboard');
-        } else {
-          router.push('/');
-        }
+        // Redirect to a default dashboard page.
+        // The navbar will show the correct links based on the user's role.
+        // The middleware will protect routes, so users can't access pages they are not authorized for.
+        router.push('/anggota/dashboard');
       }
     } catch (error) {
       toast.error('Terjadi kesalahan saat login');

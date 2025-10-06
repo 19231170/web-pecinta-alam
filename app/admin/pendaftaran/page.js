@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   Search, 
   Filter, 
@@ -105,7 +104,7 @@ export default function AdminPendaftaran() {
   };
 
   return (
-    <ProtectedRoute allowedRoles={['admin']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -391,6 +390,6 @@ export default function AdminPendaftaran() {
           </div>
         )}
       </div>
-    </ProtectedRoute>
+    </>
   );
 }
