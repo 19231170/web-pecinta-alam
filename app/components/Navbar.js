@@ -45,19 +45,8 @@ export default function Navbar() {
 
   const menuItems = getMenuItems();
 
-  const handleSignOut = async () => {
-    try {
-      // Force redirect to port 3000
-      const baseUrl = 'http://localhost:3000';
-      await signOut({ 
-        callbackUrl: `${baseUrl}/auth/login`,
-        redirect: true
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Fallback manual redirect
-      window.location.href = 'http://localhost:3000/auth/login';
-    }
+  const handleSignOut = () => {
+    signOut();
   };
 
   return (
@@ -103,7 +92,7 @@ export default function Navbar() {
                       </div>
                     </div>
                     <Link
-                      href="/profile"
+                      href="/anggota/profile"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <Settings className="h-4 w-4 mr-2" />

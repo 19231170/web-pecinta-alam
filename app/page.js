@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mountain, Users, FileText, Calendar, Award, Heart } from "lucide-react";
+import { Mountain, Users, FileText, Calendar, Award, Heart, MapPin } from "lucide-react";
+import ClientMap from "./components/ClientMap";
 
 export default function Home() {
   return (
@@ -74,8 +75,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Interactive Map Section */}
       <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <MapPin className="h-12 w-12 text-green-600 mx-auto mb-4" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Temukan Lokasi Kami
+            </h2>
+            <p className="text-xl text-gray-600">
+              Jelajahi lokasi basecamp dan titik kumpul kegiatan kami melalui peta interaktif ini.
+            </p>
+          </div>
+          <div className="rounded-lg overflow-hidden shadow-lg">
+            <ClientMap />
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">

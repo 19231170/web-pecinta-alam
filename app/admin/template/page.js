@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   Plus, 
   Edit, 
@@ -275,7 +274,7 @@ Update: ${new Date(template.updatedAt).toLocaleDateString('id-ID')}`
   );
 
   return (
-    <ProtectedRoute allowedRoles={['admin']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -608,6 +607,6 @@ Update: ${new Date(template.updatedAt).toLocaleDateString('id-ID')}`
           </div>
         )}
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

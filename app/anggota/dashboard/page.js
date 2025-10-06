@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { useSession } from 'next-auth/react';
 import { 
   Users, 
@@ -109,7 +108,7 @@ export default function AnggotaDashboard() {
   }, []);
 
   return (
-    <ProtectedRoute allowedRoles={['anggota']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -289,7 +288,7 @@ export default function AnggotaDashboard() {
                 </a>
 
                 <a
-                  href="/profile"
+                  href="/anggota/profile"
                   className="p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
                 >
                   <Award className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -301,6 +300,6 @@ export default function AnggotaDashboard() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

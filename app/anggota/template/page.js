@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { FileText, Download, Eye, Search, Filter, Calendar } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -99,16 +98,14 @@ export default function AnggotaTemplate() {
 
   if (loading) {
     return (
-      <ProtectedRoute allowedRoles={['anggota']}>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        </div>
-      </ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute allowedRoles={['anggota']}>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow">
@@ -285,6 +282,6 @@ export default function AnggotaTemplate() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

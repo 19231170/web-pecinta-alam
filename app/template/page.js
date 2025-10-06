@@ -99,8 +99,8 @@ export default function TemplatePage() {
       ) : (
         <>
           {/* Hero Section */}
-          <section className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">{/* Rest of the JSX content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <FileText className="h-16 w-16 mx-auto mb-6 text-purple-200" />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -312,6 +312,8 @@ export default function TemplatePage() {
           </button>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }

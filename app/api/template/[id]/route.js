@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/auth';
 import path from 'path';
 import fs from 'fs';
 
@@ -29,7 +29,7 @@ export async function GET(request, { params }) {
     });
 
     // Log download if user is authenticated
-    const session = await getServerSession();
+    const session = await auth();
     if (session?.user) {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email }
