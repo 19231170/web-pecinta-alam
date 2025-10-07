@@ -14,7 +14,9 @@ import {
   EyeOff,
   RefreshCw,
   Trash2,
-  Download
+  Download,
+  Map,
+  MapPin
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -29,7 +31,11 @@ export default function AdminPengaturan() {
     autoApproval: false,
     backupInterval: 'weekly',
     sessionTimeout: 30,
-    maintenanceMode: false
+    maintenanceMode: false,
+    mapLatitude: -6.200000,
+    mapLongitude: 106.816666,
+    mapZoom: 12,
+    mapMarkers: []
   });
 
   const [databaseStats, setDatabaseStats] = useState({
@@ -47,6 +53,8 @@ export default function AdminPengaturan() {
     newPassword: '',
     confirmPassword: ''
   });
+
+  const [newMarker, setNewMarker] = useState({ name: '', lat: '', lng: '' });
 
   const [loading, setLoading] = useState(true);
 
@@ -121,6 +129,28 @@ export default function AdminPengaturan() {
       newPassword: '',
       confirmPassword: ''
     });
+  };
+
+  const handleAddMarker = () => {
+    if (!newMarker.name || !newMarker.lat || !newMarker.lng) {
+      toast.error('Semua field marker harus diisi');
+      return;
+    }
+    const markerToAdd = {
+      id: Date.now(),
+      name: newMarker.name,
+      lat: parseFloat(newMarker.lat),
+      lng: parseFloat(newMarker.lng),
+    };
+    handleSettingChange('mapMarkers', [...settings.mapMarkers, markerToAdd]);
+    setNewMarker({ name: '', lat: '', lng: '' });
+    toast.success('Marker berhasil ditambahkan');
+  };
+
+  const handleDeleteMarker = (id) => {
+    const updatedMarkers = settings.mapMarkers.filter(marker => marker.id !== id);
+    handleSettingChange('mapMarkers', updatedMarkers);
+    toast.success('Marker berhasil dihapus');
   };
 
   const handleBackupDatabase = () => {
@@ -277,6 +307,109 @@ export default function AdminPengaturan() {
                       />
                     </button>
                   </div>
+                </div>
+              </div>
+
+              {/* Interactive Map Settings */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center mb-4">
+                  <Map className="h-5 w-5 text-indigo-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">Pengaturan Peta Interaktif</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={settings.mapLatitude}
+                      onChange={(e) => handleSettingChange('mapLatitude', parseFloat(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={settings.mapLongitude}
+                      onChange={(e) => handleSettingChange('mapLongitude', parseFloat(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Zoom Level</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={settings.mapZoom}
+                      onChange={(e) => handleSettingChange('mapZoom', parseInt(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Marker Management */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center mb-4">
+                  <MapPin className="h-5 w-5 text-orange-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">Kelola Titik Peta (Marker)</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Nama Marker"
+                      value={newMarker.name}
+                      onChange={(e) => setNewMarker({...newMarker, name: e.target.value})}
+                      className="md:col-span-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Latitude"
+                      value={newMarker.lat}
+                      onChange={(e) => setNewMarker({...newMarker, lat: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Longitude"
+                      value={newMarker.lng}
+                      onChange={(e) => setNewMarker({...newMarker, lng: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <button
+                    onClick={handleAddMarker}
+                    className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors"
+                  >
+                    Tambah Marker
+                  </button>
+                </div>
+                <div className="mt-6 space-y-3">
+                  <h4 className="text-sm font-medium text-gray-900">Daftar Marker</h4>
+                  {settings.mapMarkers && settings.mapMarkers.length > 0 ? (
+                    <ul className="border border-gray-200 rounded-lg divide-y divide-gray-200">
+                      {settings.mapMarkers.map(marker => (
+                        <li key={marker.id} className="p-3 flex justify-between items-center">
+                          <div>
+                            <p className="font-medium text-gray-800">{marker.name}</p>
+                            <p className="text-xs text-gray-500">Lat: {marker.lat}, Lng: {marker.lng}</p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteMarker(marker.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-500 text-center py-4">Belum ada marker.</p>
+                  )}
                 </div>
               </div>
 

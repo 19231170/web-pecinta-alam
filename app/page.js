@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mountain, Users, FileText, Calendar, Award, Heart } from "lucide-react";
+import { Mountain, Users, FileText, Calendar, Award, Heart, Map } from "lucide-react";
+import InteractiveMap from "./components/InteractiveMap";
 
 export default function Home() {
   return (
@@ -70,6 +71,24 @@ export default function Home() {
                 Asah kemampuan leadership, survival, dan soft skills melalui berbagai pelatihan dan kegiatan.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Map Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Map className="h-12 w-12 text-green-600 mx-auto mb-4" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Jelajahi Lokasi Kami
+            </h2>
+            <p className="text-xl text-gray-600">
+              Lihat lokasi-lokasi penting dan kegiatan kami di peta interaktif.
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <InteractiveMap />
           </div>
         </div>
       </section>

@@ -26,6 +26,7 @@ const nextConfig = {
         : process.env.VERCEL_URL 
           ? `https://${process.env.VERCEL_URL}` 
           : 'https://web-pecinta-alam.vercel.app'),
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
   // Make sure output is set to standalone for better compatibility with hosting platforms
   output: 'standalone'
