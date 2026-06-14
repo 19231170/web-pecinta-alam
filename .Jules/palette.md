@@ -1,0 +1,3 @@
+## 2026-06-14 - Missing ARIA Labels on Icon-Only Buttons
+**Pelajaran:** Banyak tombol dalam aplikasi ini (seperti di app/admin/anggota/page.js) yang hanya menggunakan ikon tanpa teks yang menyertainya (misalnya, Eye, Edit, Trash2) tidak memiliki `aria-label` atau teks alternatif yang dapat diakses oleh pembaca layar. Hal ini membuat aplikasi sulit digunakan oleh pengguna yang mengandalkan teknologi bantu.
+**Tindakan:** Mulai tambahkan `aria-label` ke semua tombol yang hanya menggunakan ikon di seluruh antarmuka aplikasi untuk memastikan aksesibilitas keyboard dan pembaca layar yang lebih baik.

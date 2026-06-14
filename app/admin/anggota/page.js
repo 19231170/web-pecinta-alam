@@ -368,18 +368,24 @@ export default function AdminAnggota() {
                           <button
                             onClick={() => handleView(member)}
                             className="text-blue-600 hover:text-blue-900"
+                            aria-label="Lihat detail anggota"
+                            title="Lihat detail anggota"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleEdit(member)}
                             className="text-green-600 hover:text-green-900"
+                            aria-label="Edit data anggota"
+                            title="Edit data anggota"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(member)}
                             className="text-red-600 hover:text-red-900"
+                            aria-label="Hapus anggota"
+                            title="Hapus anggota"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -418,6 +424,8 @@ export default function AdminAnggota() {
                   <button
                     onClick={() => setShowModal(false)}
                     className="text-gray-400 hover:text-gray-600"
+                    aria-label="Tutup modal"
+                    title="Tutup modal"
                   >
                     <span className="sr-only">Tutup</span>
                     ✕
